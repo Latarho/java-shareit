@@ -11,6 +11,7 @@ import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.user.storage.UserStorage;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,7 +47,7 @@ public class ItemServiceImpl implements ItemService {
         Item newItem = ItemMapper.toItem(itemDto);
         newItem.setOwnerId(ownerId);
         Item updateItem = itemStorage.getById(itemId);
-        if (newItem.getOwnerId() != updateItem.getOwnerId()) {
+        if (!Objects.equals(newItem.getOwnerId(), updateItem.getOwnerId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "У пользователя: " + ownerId + " нет вещи: " + itemId);
         }

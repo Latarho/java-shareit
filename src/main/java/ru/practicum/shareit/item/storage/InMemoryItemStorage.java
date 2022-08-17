@@ -3,10 +3,7 @@ package ru.practicum.shareit.item.storage;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class InMemoryItemStorage implements ItemStorage {
@@ -30,7 +27,7 @@ public class InMemoryItemStorage implements ItemStorage {
     public List<Item> getAllItemsByUserId(Long userId) {
         List<Item> itemsWithOwner = new ArrayList<>();
         for (Item item : items.values()) {
-            if (item.getOwnerId() == userId) {
+            if (Objects.equals(item.getOwnerId(), userId)) {
                 itemsWithOwner.add(item);
             }
         }
