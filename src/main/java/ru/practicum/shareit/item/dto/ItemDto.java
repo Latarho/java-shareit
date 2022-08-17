@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class ItemDto {
 
-    private long id;
+    private Long id;
 
     @NotEmpty
     private String name;
@@ -25,4 +25,8 @@ public class ItemDto {
     @JsonProperty(value = "available", required = true)
     @NotNull
     private Boolean available;
+
+    private Long ownerId;
+
+    private Long requestId;
 }

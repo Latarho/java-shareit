@@ -10,8 +10,8 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.user.storage.UserStorage;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +24,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto create(long ownerId, ItemDto itemDto) {
         checkUser(ownerId);
         Item newItem = ItemMapper.toItem(itemDto);
-        newItem.setOwner(userStorage.getById(ownerId));
+        newItem.setOwnerId(ownerId);
         return ItemMapper.toItemDto(itemStorage.create(newItem));
     }
 
@@ -35,21 +35,18 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getAllItemsByUserId(long userId) {
-        List<Item> itemsWithOwner = itemStorage.getAllItemsByUserId(userId);
-        List<ItemDto> itemsDtoWithOwner = new ArrayList<>();
-        for (Item item : itemsWithOwner) {
-            itemsDtoWithOwner.add(ItemMapper.toItemDto(item));
-        }
-        return itemsDtoWithOwner;
+        return itemStorage.getAllItemsByUserId(userId).stream()
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public ItemDto update(long ownerId, ItemDto itemDto, long itemId) {
         checkUser(ownerId);
         Item newItem = ItemMapper.toItem(itemDto);
-        newItem.setOwner(userStorage.getById(ownerId));
+        newItem.setOwnerId(ownerId);
         Item updateItem = itemStorage.getById(itemId);
-        if (newItem.getOwner() != updateItem.getOwner()) {
+        if (newItem.getOwnerId() != updateItem.getOwnerId()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "У пользователя: " + ownerId + " нет вещи: " + itemId);
         }
@@ -57,9 +54,7 @@ public class ItemServiceImpl implements ItemService {
             updateItem.setName(newItem.getName());
         }
         if (newItem.getDescription() != null) {
-            updateItem.setDescription(newItem.getDescription(
-
-            ));
+            updateItem.setDescription(newItem.getDescription());
         }
         if (newItem.getAvailable() != null) {
             updateItem.setAvailable(newItem.getAvailable());
@@ -69,14 +64,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> searchItem(String request) {
-        List<Item> foundItems = itemStorage.searchItem(request);
-        List<ItemDto> foundItemsDto = new ArrayList<>();
-        for (Item item : foundItems) {
-            if (item.getAvailable()) {
-                foundItemsDto.add(ItemMapper.toItemDto(item));
-            }
-        }
-        return foundItemsDto;
+        return itemStorage.searchItem(request).stream()
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList());
     }
 
     private void checkUser(long id) {

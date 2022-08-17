@@ -30,7 +30,7 @@ public class InMemoryItemStorage implements ItemStorage {
     public List<Item> getAllItemsByUserId(long userId) {
         List<Item> itemsWithOwner = new ArrayList<>();
         for (Item item : items.values()) {
-            if (item.getOwner().getId() == userId) {
+            if (item.getOwnerId() == userId) {
                 itemsWithOwner.add(item);
             }
         }
@@ -49,10 +49,10 @@ public class InMemoryItemStorage implements ItemStorage {
         if (request.isEmpty() || request.isBlank()) {
             return searchItems;
         }
+        request = request.toLowerCase();
         for (Item item : items.values()) {
-            request = request.toLowerCase();
-            if (item.getName().toLowerCase().contains(request) ||
-                    item.getDescription().toLowerCase().contains(request)) {
+            if ((item.getAvailable().equals(true) && item.getName().toLowerCase().contains(request)) ||
+                    (item.getAvailable().equals(true) && item.getDescription().toLowerCase().contains(request))) {
                 searchItems.add(item);
             }
         }

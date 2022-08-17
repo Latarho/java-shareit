@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Data
 public class ItemRequest {
 
-    private long id;
+    private Long id;
     private String description;
     private User requestor;
     private LocalDateTime created;
