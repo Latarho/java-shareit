@@ -12,7 +12,7 @@ import java.util.Map;
 public class InMemoryUserStorage implements UserStorage {
 
     private final Map<Long, User> users = new HashMap<>();
-    private long id = 0;
+    private Long id = 0L;
 
     @Override
     public User create(User user) {
@@ -22,7 +22,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getById(long id) {
+    public User getById(Long id) {
         return users.get(id);
     }
 
@@ -38,11 +38,11 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void delete(long id) {
+    public void delete(Long id) {
         users.remove(id);
     }
 
-    private long generateUserId() {
+    private Long generateUserId() {
         id++;
         return id;
     }

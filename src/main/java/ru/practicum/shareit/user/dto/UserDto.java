@@ -13,7 +13,7 @@ import javax.validation.constraints.NotEmpty;
 @AllArgsConstructor
 public class UserDto {
 
-    private long id;
+    private Long id;
 
     @NotEmpty(message = "Поле name не может быть пустым.")
     private String name;

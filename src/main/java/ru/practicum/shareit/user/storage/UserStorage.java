@@ -8,11 +8,11 @@ public interface UserStorage {
 
     User create(User user);
 
-    User getById(long id);
+    User getById(Long id);
 
     List<User> getAll();
 
     User update(User user);
 
-    void delete(long id);
+    void delete(Long id);
 }

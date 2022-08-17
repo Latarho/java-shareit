@@ -8,9 +8,9 @@ public interface ItemStorage {
 
     Item create(Item item);
 
-    Item getById(long id);
+    Item getById(Long id);
 
-    List<Item> getAllItemsByUserId(long userId);
+    List<Item> getAllItemsByUserId(Long userId);
 
     Item update(Item item);
 

@@ -21,7 +21,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserStorage userStorage;
 
     @Override
-    public ItemDto create(long ownerId, ItemDto itemDto) {
+    public ItemDto create(Long ownerId, ItemDto itemDto) {
         checkUser(ownerId);
         Item newItem = ItemMapper.toItem(itemDto);
         newItem.setOwnerId(ownerId);
@@ -29,19 +29,19 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto getById(long id) {
+    public ItemDto getById(Long id) {
         return ItemMapper.toItemDto(itemStorage.getById(id));
     }
 
     @Override
-    public List<ItemDto> getAllItemsByUserId(long userId) {
+    public List<ItemDto> getAllItemsByUserId(Long userId) {
         return itemStorage.getAllItemsByUserId(userId).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public ItemDto update(long ownerId, ItemDto itemDto, long itemId) {
+    public ItemDto update(Long ownerId, ItemDto itemDto, Long itemId) {
         checkUser(ownerId);
         Item newItem = ItemMapper.toItem(itemDto);
         newItem.setOwnerId(ownerId);
@@ -69,7 +69,7 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toList());
     }
 
-    private void checkUser(long id) {
+    private void checkUser(Long id) {
         if (userStorage.getById(id) == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Отсутствует пользователь id: " + id);
         }

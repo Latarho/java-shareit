@@ -24,29 +24,29 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto create(@NotEmpty @RequestHeader(USER_ID_HEADER) long ownerId,
+    public ItemDto create(@NotEmpty @RequestHeader(USER_ID_HEADER) Long ownerId,
                           @Valid @RequestBody ItemDto itemDto) {
         log.info("Получен запрос - создание вещи id: " + itemDto.toString());
         return itemService.create(ownerId, itemDto);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto update(@NotEmpty @RequestHeader(USER_ID_HEADER) long ownerId,
+    public ItemDto update(@NotEmpty @RequestHeader(USER_ID_HEADER) Long ownerId,
                               @RequestBody ItemDto itemDto,
-                              @PathVariable long itemId) {
+                              @PathVariable Long itemId) {
         log.info("Получен запрос - обновление существующей вещи id: " + itemId);
         return itemService.update(ownerId, itemDto, itemId);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getById(@NotEmpty @RequestHeader(USER_ID_HEADER) long id,
-                               @PathVariable long itemId) {
+    public ItemDto getById(@NotEmpty @RequestHeader(USER_ID_HEADER) Long id,
+                               @PathVariable Long itemId) {
         log.info("Получен запрос - получение вещи по переданному id: " + itemId);
         return itemService.getById(itemId);
     }
 
     @GetMapping
-    public List<ItemDto> getAllItemsByUserId(@NotEmpty @RequestHeader(USER_ID_HEADER) long userId) {
+    public List<ItemDto> getAllItemsByUserId(@NotEmpty @RequestHeader(USER_ID_HEADER) Long userId) {
         log.info("Получен запрос - получение списка вещей закрепленных за пользователем id: " + userId);
         return itemService.getAllItemsByUserId(userId);
     }

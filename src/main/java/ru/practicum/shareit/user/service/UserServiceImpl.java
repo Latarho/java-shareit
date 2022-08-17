@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getById(long id) {
+    public UserDto getById(Long id) {
         if (userStorage.getById(id) == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Отсутствует пользователь id: " + id);
         }
@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto update(long id, UserDto userDto) {
+    public UserDto update(Long id, UserDto userDto) {
         if (userStorage.getById(id) == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Отсутствует пользователь id: " + id);
         }
@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(long id) {
+    public void delete(Long id) {
         if (userStorage.getById(id) == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Отсутствует пользователь id: " + id);
         }

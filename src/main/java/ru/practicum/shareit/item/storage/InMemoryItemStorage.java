@@ -12,7 +12,7 @@ import java.util.Map;
 public class InMemoryItemStorage implements ItemStorage {
 
     private final Map<Long, Item> items = new HashMap<>();
-    private long id = 0;
+    private Long id = 0L;
 
     @Override
     public Item create(Item item) {
@@ -22,12 +22,12 @@ public class InMemoryItemStorage implements ItemStorage {
     }
 
     @Override
-    public Item getById(long id) {
+    public Item getById(Long id) {
         return items.get(id);
     }
 
     @Override
-    public List<Item> getAllItemsByUserId(long userId) {
+    public List<Item> getAllItemsByUserId(Long userId) {
         List<Item> itemsWithOwner = new ArrayList<>();
         for (Item item : items.values()) {
             if (item.getOwnerId() == userId) {
@@ -59,7 +59,7 @@ public class InMemoryItemStorage implements ItemStorage {
         return searchItems;
     }
 
-    private long generateItemId() {
+    private Long generateItemId() {
         id++;
         return id;
     }
