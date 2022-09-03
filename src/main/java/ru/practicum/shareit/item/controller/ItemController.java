@@ -1,59 +1,91 @@
 package ru.practicum.shareit.item.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.exception.*;
+import ru.practicum.shareit.helpers.HeaderKey;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
-@Slf4j
+@Validated
 @RestController
+@Slf4j
+@RequiredArgsConstructor
 @RequestMapping("/items")
 public class ItemController {
-
-    private static final String USER_ID_HEADER = "X-Sharer-User-Id"; //идентификатор пользователя, который добавляет вещь (владелец вещи)
     private final ItemService itemService;
 
-    @Autowired
-    public ItemController(ItemService itemService) {
-        this.itemService = itemService;
-    }
-
     @PostMapping
-    public ItemDto create(@NotEmpty @RequestHeader(USER_ID_HEADER) Long ownerId,
-                          @Valid @RequestBody ItemDto itemDto) {
-        log.info("Получен запрос - создание вещи id: " + itemDto.toString());
-        return itemService.create(ownerId, itemDto);
+    public ItemDto create(@RequestHeader(HeaderKey.USER_KEY) Long userId,
+                          @Valid @RequestBody ItemCreatingDto itemCreatingDto)
+            throws NoHeaderException, UserNotFoundException, ValidationException {
+        log.info("Получен запрос - создание новой вещи: " + itemCreatingDto.toString());
+        if (userId == null) {
+            throw new NoHeaderException("В запросе отсутствует заголовок");
+        } else {
+            return itemService.create(userId, itemCreatingDto);
+        }
     }
 
-    @PatchMapping("/{itemId}")
-    public ItemDto update(@NotEmpty @RequestHeader(USER_ID_HEADER) Long ownerId,
-                              @RequestBody ItemDto itemDto,
-                              @PathVariable Long itemId) {
-        log.info("Получен запрос - обновление существующей вещи id: " + itemId);
-        return itemService.update(ownerId, itemDto, itemId);
+    @PatchMapping("/{id}")
+    public ItemDto update(@RequestHeader(HeaderKey.USER_KEY) Long userId,
+                          @PathVariable Long id, @RequestBody ItemCreatingDto itemCreatingDto)
+            throws NoHeaderException, ValidationException, AuthFailedException {
+        log.info("Получен запрос - обновление существующей вещи: " + itemCreatingDto.toString());
+        if (userId == null) {
+            throw new NoHeaderException("В запросе отсутствует заголовок");
+        } else {
+            return itemService.update(userId, id, itemCreatingDto);
+        }
     }
 
-    @GetMapping("/{itemId}")
-    public ItemDto getById(@NotEmpty @RequestHeader(USER_ID_HEADER) Long id,
-                               @PathVariable Long itemId) {
-        log.info("Получен запрос - получение вещи по переданному id: " + itemId);
-        return itemService.getById(itemId);
+    @GetMapping("/{id}")
+    public ItemWithCommentDto getById(@RequestHeader(HeaderKey.USER_KEY) Long userId, @PathVariable Long id)
+            throws NoHeaderException, ItemNotFoundException, ValidationException, UserNotFoundException {
+        log.info("Получен запрос - получение вещи по переданному id: " + id);
+        if (userId == null) {
+            throw new NoHeaderException("В запросе отсутствует заголовок");
+        } else {
+            return itemService.getById(userId, id);
+        }
     }
 
     @GetMapping
-    public List<ItemDto> getAllItemsByUserId(@NotEmpty @RequestHeader(USER_ID_HEADER) Long userId) {
-        log.info("Получен запрос - получение списка вещей закрепленных за пользователем id: " + userId);
-        return itemService.getAllItemsByUserId(userId);
+    public List<ItemWithCommentDto> getAll(@RequestHeader(HeaderKey.USER_KEY) Long userId)
+            throws NoHeaderException, UserNotFoundException {
+        log.info("Получен запрос - получение списка вещей");
+        if (userId == null) {
+            throw new NoHeaderException("В запросе отсутствует заголовок");
+        } else {
+            return itemService.getAll(userId);
+        }
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItem(@RequestParam String text) {
+    public List<ItemDto> searchByText(@RequestHeader(HeaderKey.USER_KEY) Long userId, @RequestParam String text)
+            throws NoHeaderException, UserNotFoundException {
         log.info("Получен запрос - поиск вещи по тексту: " + text);
-        return itemService.searchItem(text);
+        if (userId == null) {
+            throw new NoHeaderException("В запросе отсутствует заголовок");
+        } else {
+            return itemService.searchByText(userId, text);
+        }
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto createComment(@RequestHeader(HeaderKey.USER_KEY) Long userId, @PathVariable Long itemId,
+                                    @RequestBody @Valid CommentCreatingDto commentCreatingDto)
+            throws NoHeaderException, UserNotFoundException, ValidationException {
+        log.info("Получен запрос - добавление отзыва к вещи id: " + itemId);
+        if (userId == null) {
+            throw new NoHeaderException("В запросе отсутствует заголовок");
+        } else {
+            return itemService.createComment(userId, itemId, commentCreatingDto);
+        }
     }
 }

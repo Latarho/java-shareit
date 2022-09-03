@@ -1,6 +1,9 @@
 package ru.practicum.shareit.item.dto;
 
+import ru.practicum.shareit.booking.dto.BookingItemDto;
 import ru.practicum.shareit.item.model.Item;
+
+import java.util.List;
 
 /**
  * Маппинг объекта класса Item в ItemDto и наоборот.
@@ -13,17 +16,30 @@ public class ItemMapper {
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
-                item.getOwnerId() != null ? item.getOwnerId() : null,
                 item.getRequestId() != null ? item.getRequestId() : null);
     }
 
-    public static Item toItem(ItemDto itemDto) {
+    public static Item toItem(ItemCreatingDto itemCreatingDto) {
         return new Item(
-                itemDto.getId(),
-                itemDto.getName(),
-                itemDto.getDescription(),
-                itemDto.getAvailable(),
-                itemDto.getOwnerId() != null ? itemDto.getOwnerId() : null,
-                itemDto.getRequestId() != null ? itemDto.getRequestId() : null);
+                null,
+                itemCreatingDto.getName(),
+                itemCreatingDto.getDescription(),
+                itemCreatingDto.getAvailable(),
+                null,
+                null);
+    }
+
+    public static ItemWithCommentDto toItemDtoWithComment(Item item, List<CommentForItemDto> comments,
+                                                          BookingItemDto lastBooking, BookingItemDto nextBooking) {
+        return new ItemWithCommentDto(
+                item.getId(),
+                item.getName(),
+                item.getDescription(),
+                item.getAvailable(),
+                item.getRequestId() != null ? item.getRequestId() : null,
+                comments,
+                lastBooking,
+                nextBooking
+        );
     }
 }
