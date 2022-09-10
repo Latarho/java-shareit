@@ -13,6 +13,6 @@ public class ItemRequest {
 
     private Long id;
     private String description;
-    private User requestor;
+    private Long requesterId;
     private LocalDateTime created;
 }
