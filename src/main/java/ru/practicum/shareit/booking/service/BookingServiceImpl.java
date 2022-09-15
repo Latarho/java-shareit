@@ -1,12 +1,14 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingCreatingDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.storage.BookingRepository;
 import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.item.model.Item;
@@ -17,7 +19,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -87,38 +88,38 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllBookingsForRequester(Long userId, String state) throws UserNotFoundException,
-            UnsupportedStatusException {
+    public List<BookingDto> getAllBookingsForRequesterWithPagination(Long userId, State state, Integer from,
+                                                                     Integer size)
+            throws UserNotFoundException {
         if (userRepository.findById(userId).isEmpty()) {
             throw new UserNotFoundException("Отсутствует пользователь id: " + userId);
         } else {
-            List<Booking> foundBookings;
+            List<Booking> foundBookings = new ArrayList<>();
             switch (state) {
-                case ("ALL"):
-                    foundBookings = bookingRepository.findByBooker_idOrderByStartDesc(userId);
+                case ALL:
+                    foundBookings = bookingRepository.findByBooker_idOrderByStartDesc(userId,
+                            PageRequest.of(from / size, size));
                     break;
-                case ("WAITING"):
+                case WAITING:
                     foundBookings = bookingRepository.findByBooker_idAndStatusOrderByStartDesc(userId,
-                            BookingStatus.WAITING);
+                            BookingStatus.WAITING, PageRequest.of(from / size, size));
                     break;
-                case ("REJECTED"):
+                case REJECTED:
                     foundBookings = bookingRepository.findByBooker_idAndStatusOrderByStartDesc(userId,
-                            BookingStatus.REJECTED);
+                            BookingStatus.REJECTED, PageRequest.of(from / size, size));
                     break;
-                case ("PAST"):
+                case PAST:
                     foundBookings = bookingRepository.findByBooker_idAndEndBeforeOrderByStartDesc(userId,
-                            LocalDateTime.now());
+                            LocalDateTime.now(), PageRequest.of(from / size, size));
                     break;
-                case "FUTURE":
+                case FUTURE:
                     foundBookings = bookingRepository.findByBooker_idAndStartAfterOrderByStartDesc(userId,
-                            LocalDateTime.now());
+                            LocalDateTime.now(), PageRequest.of(from / size, size));
                     break;
-                case ("CURRENT"):
+                case CURRENT:
                     foundBookings = bookingRepository.findByBooker_idAndStartBeforeAndEndAfterOrderByStartDesc(userId,
-                            LocalDateTime.now(), LocalDateTime.now());
+                            LocalDateTime.now(), LocalDateTime.now(), PageRequest.of(from / size, size));
                     break;
-                default:
-                    throw new UnsupportedStatusException();
             }
             List<BookingDto> listBookingDto = new ArrayList<>();
             for (Booking booking : foundBookings) {
@@ -129,34 +130,37 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllBookingsForOwner(Long userId, String state) throws UserNotFoundException,
-            UnsupportedStatusException {
+    public List<BookingDto> getAllBookingsForOwnerWithPagination(Long userId, State state, Integer from, Integer size)
+            throws UserNotFoundException {
         if (userRepository.findById(userId).isEmpty()) {
             throw new UserNotFoundException("Отсутствует пользователь id: " + userId);
         } else {
-            List<Booking> foundBookings;
+            List<Booking> foundBookings = new ArrayList<>();
             switch (state) {
-                case ("ALL"):
-                    foundBookings = bookingRepository.findForOwnerAllStatus(userId);
+                case ALL:
+                    foundBookings = bookingRepository.findForOwnerAllStatus(userId,
+                            PageRequest.of(from / size, size));
                     break;
-                case ("WAITING"):
-                    foundBookings = bookingRepository.findForOwnerStatus(userId, BookingStatus.WAITING);
+                case WAITING:
+                    foundBookings = bookingRepository.findForOwnerStatus(userId, BookingStatus.WAITING,
+                            PageRequest.of(from / size, size));
                     break;
-                case ("REJECTED"):
-                    foundBookings = bookingRepository.findForOwnerStatus(userId, BookingStatus.REJECTED);
+                case REJECTED:
+                    foundBookings = bookingRepository.findForOwnerStatus(userId, BookingStatus.REJECTED,
+                            PageRequest.of(from / size, size));
                     break;
-                case ("PAST"):
-                    foundBookings = bookingRepository.findForOwnerPast(userId, LocalDateTime.now());
+                case PAST:
+                    foundBookings = bookingRepository.findForOwnerPast(userId, LocalDateTime.now(),
+                            PageRequest.of(from / size, size));
                     break;
-                case ("FUTURE"):
-                    foundBookings = bookingRepository.findForOwnerFuture(userId, LocalDateTime.now());
+                case FUTURE:
+                    foundBookings = bookingRepository.findForOwnerFuture(userId, LocalDateTime.now(),
+                            PageRequest.of(from / size, size));
                     break;
-                case ("CURRENT"):
+                case CURRENT:
                     foundBookings = bookingRepository.findForOwnerCurrent(userId, LocalDateTime.now(),
-                            LocalDateTime.now());
+                            LocalDateTime.now(), PageRequest.of(from / size, size));
                     break;
-                default:
-                    throw new UnsupportedStatusException();
             }
             List<BookingDto> listBookingDto = new ArrayList<>();
             for (Booking booking : foundBookings) {
