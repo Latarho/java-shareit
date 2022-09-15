@@ -15,12 +15,13 @@ public interface ItemService {
     ItemWithCommentDto getById(Long ownerId, Long id) throws ValidationException, ItemNotFoundException,
             UserNotFoundException;
     // Получение списка вещей
-    List<ItemWithCommentDto> getAll(Long userId) throws UserNotFoundException;
+    List<ItemWithCommentDto> getAllWithPagination(Long userId, Integer from, Integer size) throws UserNotFoundException;
     // Обновление существующей вещи
     ItemDto update(Long ownerId, Long itemId, ItemCreatingDto itemCreatingDt) throws ValidationException,
             AuthFailedException;
     // Поиск вещи по тексту
-    List<ItemDto> searchByText(Long userId, String searchText) throws UserNotFoundException;
+    List<ItemDto> searchByTextWithPagination(Long userId, String searchText, Integer from, Integer size)
+            throws UserNotFoundException;
     // Добавление отзыва к вещи
     CommentDto createComment(Long userId, Long itemId, CommentCreatingDto commentCreatingDto) throws ValidationException,
             UserNotFoundException;
