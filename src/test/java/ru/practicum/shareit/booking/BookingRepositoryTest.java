@@ -1,10 +1,10 @@
-package ru.practicum.shareit.jpa;
+package ru.practicum.shareit.booking;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
@@ -15,7 +15,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -32,15 +31,15 @@ public class BookingRepositoryTest {
     @Autowired
     private BookingRepository bookingRepository;
 
-    User userOwner;
-    User userBooker;
-    LocalDateTime startFirst;
-    LocalDateTime endFirst;
-    LocalDateTime startSecond;
-    LocalDateTime endSecond;
-    Item item;
-    Booking BookingOne;
-    Booking BookingTwo;
+    private User userOwner;
+    private User userBooker;
+    private LocalDateTime startFirst;
+    private LocalDateTime endFirst;
+    private LocalDateTime startSecond;
+    private LocalDateTime endSecond;
+    private Item item;
+    private Booking bookingOne;
+    private Booking bookingTwo;
 
     @BeforeEach
     void BeforeEach() {
@@ -52,8 +51,8 @@ public class BookingRepositoryTest {
         endSecond = LocalDateTime.now().plusDays(3L);
         item = new Item(1L, "Это вещь номер один", "Это описание вещи номер один", true,
                 1L, null);
-        BookingOne = new Booking(1L, startFirst, endFirst, item, userBooker, BookingStatus.WAITING);
-        BookingTwo = new Booking(2L, startSecond, endSecond, item, userBooker, BookingStatus.WAITING);
+        bookingOne = new Booking(1L, startFirst, endFirst, item, userBooker, BookingStatus.WAITING);
+        bookingTwo = new Booking(2L, startSecond, endSecond, item, userBooker, BookingStatus.WAITING);
     }
 
     @Test
@@ -63,14 +62,11 @@ public class BookingRepositoryTest {
 
         itemRepository.save(item);
 
-        bookingRepository.save(BookingOne);
-        bookingRepository.save(BookingTwo);
+        bookingRepository.save(bookingOne);
+        bookingRepository.save(bookingTwo);
 
-        List<Booking> foundBookings = bookingRepository.findByBooker_idOrderByStartDesc(2L,
-                PageRequest.of(0, 5));
-        List<Booking> listToCompare = new ArrayList<>();
-        listToCompare.add(BookingOne);
-        listToCompare.add(BookingTwo);
+        List<Booking> foundBookings = bookingRepository.findByBooker_idOrderByStartDesc(2L, Pageable.unpaged());
+        List<Booking> listToCompare = List.of(bookingOne, bookingTwo);
 
         assertThat(foundBookings, is(equalTo(listToCompare)));
     }
@@ -82,13 +78,12 @@ public class BookingRepositoryTest {
 
         itemRepository.save(item);
 
-        bookingRepository.save(BookingOne);
-        bookingRepository.save(BookingTwo);
+        bookingRepository.save(bookingOne);
+        bookingRepository.save(bookingTwo);
 
         List<Booking> foundBookings = bookingRepository.findByBooker_idAndEndBeforeOrderByStartDesc(2L,
-                endSecond.plusHours(10), PageRequest.of(0, 5));
-        List<Booking> listToCompare = new ArrayList<>();
-        listToCompare.add(BookingTwo);
+                endSecond.plusHours(10), Pageable.unpaged());
+        List<Booking> listToCompare = List.of(bookingTwo);
 
         assertThat(foundBookings, is(equalTo(listToCompare)));
     }
@@ -100,13 +95,12 @@ public class BookingRepositoryTest {
 
         itemRepository.save(item);
 
-        bookingRepository.save(BookingOne);
-        bookingRepository.save(BookingTwo);
+        bookingRepository.save(bookingOne);
+        bookingRepository.save(bookingTwo);
 
         List<Booking> foundBookings = bookingRepository.findByBooker_idAndStartAfterOrderByStartDesc(2L,
-                startSecond.plusHours(5), PageRequest.of(0, 5));
-        List<Booking> listToCompare = new ArrayList<>();
-        listToCompare.add(BookingOne);
+                startSecond.plusHours(5), Pageable.unpaged());
+        List<Booking> listToCompare = List.of(bookingOne);
 
         assertThat(foundBookings, is(equalTo(listToCompare)));
     }
@@ -118,14 +112,13 @@ public class BookingRepositoryTest {
 
         itemRepository.save(item);
 
-        bookingRepository.save(BookingOne);
-        BookingTwo.setStatus(BookingStatus.APPROVED);
-        bookingRepository.save(BookingTwo);
+        bookingRepository.save(bookingOne);
+        bookingTwo.setStatus(BookingStatus.APPROVED);
+        bookingRepository.save(bookingTwo);
 
         List<Booking> foundBookings = bookingRepository.findByBooker_idAndStatusOrderByStartDesc(2L,
-                BookingStatus.WAITING, PageRequest.of(0, 5));
-        List<Booking> listToCompare = new ArrayList<>();
-        listToCompare.add(BookingOne);
+                BookingStatus.WAITING, Pageable.unpaged());
+        List<Booking> listToCompare = List.of(bookingOne);
 
         assertThat(foundBookings, is(equalTo(listToCompare)));
     }
@@ -137,15 +130,14 @@ public class BookingRepositoryTest {
 
         itemRepository.save(item);
 
-        bookingRepository.save(BookingOne);
-        BookingTwo.setStatus(BookingStatus.APPROVED);
-        bookingRepository.save(BookingTwo);
+        bookingRepository.save(bookingOne);
+        bookingTwo.setStatus(BookingStatus.APPROVED);
+        bookingRepository.save(bookingTwo);
 
         List<Booking> foundBookings = bookingRepository
                 .findByBooker_idAndStartBeforeAndEndAfterOrderByStartDesc(2L, startSecond.plusHours(7),
-                        endSecond.minusHours(5), PageRequest.of(0, 5));
-        List<Booking> listToCompare = new ArrayList<>();
-        listToCompare.add(BookingTwo);
+                        endSecond.minusHours(5), Pageable.unpaged());
+        List<Booking> listToCompare = List.of(bookingTwo);
 
         assertThat(foundBookings, is(equalTo(listToCompare)));
     }
@@ -157,18 +149,14 @@ public class BookingRepositoryTest {
 
         itemRepository.save(item);
 
-        bookingRepository.save(BookingOne);
-        BookingTwo.setStatus(BookingStatus.APPROVED);
-        bookingRepository.save(BookingTwo);
-        Booking BookingThreed = new Booking(3L, startSecond, endSecond, item, userBooker, BookingStatus.REJECTED);
-        bookingRepository.save(BookingThreed);
+        bookingRepository.save(bookingOne);
+        bookingTwo.setStatus(BookingStatus.APPROVED);
+        bookingRepository.save(bookingTwo);
+        Booking bookingThree = new Booking(3L, startSecond, endSecond, item, userBooker, BookingStatus.REJECTED);
+        bookingRepository.save(bookingThree);
 
-        List<Booking> foundBookings = bookingRepository.findForOwnerAllStatus(userOwner.getId(),
-                PageRequest.of(0, 5));
-        List<Booking> listToCompare = new ArrayList<>();
-        listToCompare.add(BookingOne);
-        listToCompare.add(BookingTwo);
-        listToCompare.add(BookingThreed);
+        List<Booking> foundBookings = bookingRepository.findForOwnerAllStatus(userOwner.getId(), Pageable.unpaged());
+        List<Booking> listToCompare = List.of(bookingOne, bookingTwo, bookingThree);
 
         assertThat(foundBookings, is(equalTo(listToCompare)));
     }
@@ -180,16 +168,15 @@ public class BookingRepositoryTest {
 
         itemRepository.save(item);
 
-        bookingRepository.save(BookingOne);
-        BookingTwo.setStatus(BookingStatus.APPROVED);
-        bookingRepository.save(BookingTwo);
-        Booking BookingThreed = new Booking(3L, startSecond, endSecond, item, userBooker, BookingStatus.REJECTED);
-        bookingRepository.save(BookingThreed);
+        bookingRepository.save(bookingOne);
+        bookingTwo.setStatus(BookingStatus.APPROVED);
+        bookingRepository.save(bookingTwo);
+        Booking bookingThree = new Booking(3L, startSecond, endSecond, item, userBooker, BookingStatus.REJECTED);
+        bookingRepository.save(bookingThree);
 
         List<Booking> foundBookings = bookingRepository.findForOwnerStatus(userOwner.getId(), BookingStatus.WAITING,
-                PageRequest.of(0, 5));
-        List<Booking> listToCompare = new ArrayList<>();
-        listToCompare.add(BookingOne);
+                Pageable.unpaged());
+        List<Booking> listToCompare = List.of(bookingOne);
 
         assertThat(foundBookings, is(equalTo(listToCompare)));
     }
@@ -201,16 +188,15 @@ public class BookingRepositoryTest {
 
         itemRepository.save(item);
 
-        bookingRepository.save(BookingOne);
-        BookingTwo.setStatus(BookingStatus.APPROVED);
-        bookingRepository.save(BookingTwo);
-        Booking BookingThreed = new Booking(3L, startSecond, endSecond, item, userBooker, BookingStatus.REJECTED);
-        bookingRepository.save(BookingThreed);
+        bookingRepository.save(bookingOne);
+        bookingTwo.setStatus(BookingStatus.APPROVED);
+        bookingRepository.save(bookingTwo);
+        Booking bookingThree = new Booking(3L, startSecond, endSecond, item, userBooker, BookingStatus.REJECTED);
+        bookingRepository.save(bookingThree);
 
         List<Booking> foundBookings = bookingRepository.findForOwnerStatus(userOwner.getId(), BookingStatus.APPROVED,
-                PageRequest.of(0, 5));
-        List<Booking> listToCompare = new ArrayList<>();
-        listToCompare.add(BookingTwo);
+                Pageable.unpaged());
+        List<Booking> listToCompare = List.of(bookingTwo);
 
         assertThat(foundBookings, is(equalTo(listToCompare)));
     }
@@ -222,14 +208,13 @@ public class BookingRepositoryTest {
 
         itemRepository.save(item);
 
-        bookingRepository.save(BookingOne);
-        BookingTwo.setStatus(BookingStatus.APPROVED);
-        bookingRepository.save(BookingTwo);
+        bookingRepository.save(bookingOne);
+        bookingTwo.setStatus(BookingStatus.APPROVED);
+        bookingRepository.save(bookingTwo);
 
         List<Booking> foundBookings = bookingRepository.findForOwnerPast(userOwner.getId(), endSecond.plusHours(7),
-                PageRequest.of(0, 5));
-        List<Booking> listToCompare = new ArrayList<>();
-        listToCompare.add(BookingTwo);
+                Pageable.unpaged());
+        List<Booking> listToCompare = List.of(bookingTwo);
 
         assertThat(foundBookings, is(equalTo(listToCompare)));
     }
@@ -241,14 +226,13 @@ public class BookingRepositoryTest {
 
         itemRepository.save(item);
 
-        bookingRepository.save(BookingOne);
-        BookingTwo.setStatus(BookingStatus.APPROVED);
-        bookingRepository.save(BookingTwo);
+        bookingRepository.save(bookingOne);
+        bookingTwo.setStatus(BookingStatus.APPROVED);
+        bookingRepository.save(bookingTwo);
 
         List<Booking> foundBookings = bookingRepository.findForOwnerFuture(userOwner.getId(), startSecond.plusHours(7),
-                PageRequest.of(0, 5));
-        List<Booking> listToCompare = new ArrayList<>();
-        listToCompare.add(BookingOne);
+                Pageable.unpaged());
+        List<Booking> listToCompare = List.of(bookingOne);
 
         assertThat(foundBookings, is(equalTo(listToCompare)));
     }
@@ -260,15 +244,13 @@ public class BookingRepositoryTest {
 
         itemRepository.save(item);
 
-        bookingRepository.save(BookingOne);
-        BookingTwo.setStatus(BookingStatus.APPROVED);
-        bookingRepository.save(BookingTwo);
+        bookingRepository.save(bookingOne);
+        bookingTwo.setStatus(BookingStatus.APPROVED);
+        bookingRepository.save(bookingTwo);
 
         List<Booking> foundBookings = bookingRepository.findForOwnerCurrent(userOwner.getId(), startFirst.plusDays(2),
-                endSecond.minusDays(1), PageRequest.of(0, 5));
-        List<Booking> listToCompare = new ArrayList<>();
-        listToCompare.add(BookingOne);
-        listToCompare.add(BookingTwo);
+                endSecond.minusDays(1), Pageable.unpaged());
+        List<Booking> listToCompare = List.of(bookingOne, bookingTwo);
         
         assertThat(foundBookings, is(equalTo(listToCompare)));
     }

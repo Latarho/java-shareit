@@ -1,10 +1,10 @@
-package ru.practicum.shareit.jpa;
+package ru.practicum.shareit.requests;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.requests.model.ItemRequest;
 import ru.practicum.shareit.requests.storage.ItemRequestRepository;
@@ -12,7 +12,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -38,10 +37,10 @@ public class ItemRequestRepositoryTest {
         userRequesterTwo = new User(2L, "UserOwnerTwo", "latarho1@gmail.com");
         LocalDateTime createdFirst = LocalDateTime.now().minusDays(1L);
         itemRequestOne = new ItemRequest(1L, "Это описание запроса номер один",
-                userRequesterOne.getId(), createdFirst);
+                userRequesterOne, createdFirst, null);
         LocalDateTime createdSecond = LocalDateTime.now().minusDays(2L);
         itemRequestTwo = new ItemRequest(2L, "Это описание запроса номер два",
-                userRequesterOne.getId(), createdSecond);
+                userRequesterOne, createdSecond, null);
     }
 
     @Test
@@ -51,10 +50,8 @@ public class ItemRequestRepositoryTest {
         itemRequestRepository.save(itemRequestOne);
         itemRequestRepository.save(itemRequestTwo);
 
-        List<ItemRequest> foundRequests = itemRequestRepository.findByRequesterIdOrderByCreatedDesc(1L);
-        List<ItemRequest> listToCompare = new ArrayList<>();
-        listToCompare.add(itemRequestOne);
-        listToCompare.add(itemRequestTwo);
+        List<ItemRequest> foundRequests = itemRequestRepository.findByRequesterOrderByCreatedDesc(userRequesterOne);
+        List<ItemRequest> listToCompare = List.of(itemRequestOne, itemRequestTwo);
 
         assertThat(foundRequests, is(equalTo(listToCompare)));
     }
@@ -65,13 +62,12 @@ public class ItemRequestRepositoryTest {
         userRepository.save(userRequesterTwo);
 
         itemRequestRepository.save(itemRequestOne);
-        itemRequestTwo.setRequesterId(userRequesterTwo.getId());
+        itemRequestTwo.setRequester(userRequesterTwo);
         itemRequestRepository.save(itemRequestTwo);
 
-        List<ItemRequest> foundRequests = itemRequestRepository.findByRequesterIdNotOrderByCreatedDesc(1L,
-                PageRequest.of(0, 5));
-        List<ItemRequest> listToCompare = new ArrayList<>();
-        listToCompare.add(itemRequestTwo);
+        List<ItemRequest> foundRequests = itemRequestRepository.findAllItemRequestsByAnotherUser(userRequesterOne,
+                Pageable.unpaged());
+        List<ItemRequest> listToCompare = List.of(itemRequestTwo);
 
         assertThat(foundRequests, is(equalTo(listToCompare)));
     }
@@ -82,14 +78,12 @@ public class ItemRequestRepositoryTest {
         userRepository.save(userRequesterTwo);
 
         itemRequestRepository.save(itemRequestOne);
-        itemRequestTwo.setRequesterId(userRequesterTwo.getId());
+        itemRequestTwo.setRequester(userRequesterTwo);
         itemRequestRepository.save(itemRequestTwo);
 
-        List<ItemRequest> foundRequests = itemRequestRepository.findByRequesterIdNotOrderByCreatedDesc(3L,
-                PageRequest.of(0, 5));
-        List<ItemRequest> listToCompare = new ArrayList<>();
-        listToCompare.add(itemRequestOne);
-        listToCompare.add(itemRequestTwo);
+        List<ItemRequest> foundRequests = itemRequestRepository.findAllItemRequestsByAnotherUser(userRequesterTwo,
+                Pageable.unpaged());
+        List<ItemRequest> listToCompare = List.of(itemRequestOne);
 
         assertThat(foundRequests, is(equalTo(listToCompare)));
     }

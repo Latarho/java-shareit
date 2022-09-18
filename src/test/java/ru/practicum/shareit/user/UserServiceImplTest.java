@@ -1,4 +1,4 @@
-package ru.practicum.shareit.unit.service;
+package ru.practicum.shareit.user;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ public class UserServiceImplTest {
     @Mock
     UserRepository userRepository;
 
-    User userOne;
+    private User userOne;
 
     @BeforeEach
     void BeforeEach() {
@@ -73,9 +73,7 @@ public class UserServiceImplTest {
     @Test
     void checkGetAllUsersPositive() {
         User userTwo = new User(2L, "Pomytkin", "latarho1@gmail.com");
-        List<User> listUsers = new ArrayList<>();
-        listUsers.add(userOne);
-        listUsers.add(userTwo);
+        List<User> listUsers = List.of(userOne, userTwo);
         UserServiceImpl userService = new UserServiceImpl(userRepository);
         Mockito
                 .when(userRepository.findAll())
@@ -109,9 +107,7 @@ public class UserServiceImplTest {
     void checkUpdateUserEmailAlreadyExistsException() {
         UserDto userUpdatedDto = new UserDto(1L, "Serg Update", "latarho@gmail.com");
         User userWithEmail = new User(2L, "Serg Pomytkin", "latarho@gmail.com");
-        List<User> listUser = new ArrayList<>();
-        listUser.add(userOne);
-        listUser.add(userWithEmail);
+        List<User> listUser = List.of(userOne, userWithEmail);
         UserServiceImpl userService = new UserServiceImpl(userRepository);
         Mockito
                 .when(userRepository.findById(anyLong()))

@@ -1,4 +1,4 @@
-package ru.practicum.shareit.unit.service;
+package ru.practicum.shareit.item;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,10 +47,10 @@ public class ItemServiceImplTest {
     @Mock
     CommentRepository commentRepository;
 
-    User userBooker;
-    Item item;
-    ItemCreatingDto itemCreatingDto;
-    ItemServiceImpl itemService;
+    private User userBooker;
+    private Item item;
+    private ItemCreatingDto itemCreatingDto;
+    private ItemServiceImpl itemService;
 
     @BeforeEach
     void BeforeEach() {

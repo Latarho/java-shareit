@@ -12,7 +12,7 @@ public interface BookingService {
     BookingDto create(Long userId, BookingCreatingDto booking) throws ItemNotFoundException, UserNotFoundException,
             ValidationException;
     // Поиск бронирования по Id
-    BookingDto getById(Long userId, Long bookingId) throws ItemNotBelongsToUserException, UserNotFoundException,
+        BookingDto getById(Long userId, Long bookingId) throws ItemNotBelongsToUserException, UserNotFoundException,
             BookingNotFoundException;
     // Получение информации по всем бронированиям для пользователя
     List<BookingDto> getAllBookingsForRequesterWithPagination(Long userId, State state, Integer from, Integer size)

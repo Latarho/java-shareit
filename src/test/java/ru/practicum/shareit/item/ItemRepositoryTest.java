@@ -1,4 +1,4 @@
-package ru.practicum.shareit.jpa;
+package ru.practicum.shareit.item;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,11 +31,11 @@ public class ItemRepositoryTest {
     @Autowired
     private ItemRequestRepository itemRequestRepository;
 
-    User userOwnerOne;
-    User userOwnerTwo;
-    Item itemOne;
-    Item itemTwo;
-    Item itemThree;
+    private User userOwnerOne;
+    private User userOwnerTwo;
+    private Item itemOne;
+    private Item itemTwo;
+    private Item itemThree;
 
     @BeforeEach
     void BeforeEach() {
@@ -59,16 +59,13 @@ public class ItemRepositoryTest {
         itemRepository.save(itemThree);
 
         List<Item> foundItems = itemRepository.findAllByOrderByIdAsc(PageRequest.of(0, 5));
-        List<Item> listToCompare = new ArrayList<>();
-        listToCompare.add(itemOne);
-        listToCompare.add(itemTwo);
-        listToCompare.add(itemThree);
+        List<Item> listToCompare = List.of(itemOne, itemTwo, itemThree);
 
         assertThat(foundItems, is(equalTo(listToCompare)));
     }
 
     @Test
-    void checkSearchItemByText() {
+    void checkSearchItemByTextName() {
         userRepository.save(userOwnerOne);
         userRepository.save(userOwnerTwo);
 
@@ -77,8 +74,22 @@ public class ItemRepositoryTest {
         itemRepository.save(itemThree);
 
         List<Item> foundItems = itemRepository.search("Это вещь номер од", PageRequest.of(0, 5));
-        List<Item> listToCompare = new ArrayList<>();
-        listToCompare.add(itemOne);
+        List<Item> listToCompare = List.of(itemOne);
+
+        assertThat(foundItems, is(equalTo(listToCompare)));
+    }
+
+    @Test
+    void checkSearchItemByTextDescription() {
+        userRepository.save(userOwnerOne);
+        userRepository.save(userOwnerTwo);
+
+        itemRepository.save(itemOne);
+        itemRepository.save(itemTwo);
+        itemRepository.save(itemThree);
+
+        List<Item> foundItems = itemRepository.search("Это описание вещи номер од", PageRequest.of(0, 5));
+        List<Item> listToCompare = List.of(itemOne);
 
         assertThat(foundItems, is(equalTo(listToCompare)));
     }
@@ -89,10 +100,9 @@ public class ItemRepositoryTest {
         userRepository.save(userOwnerTwo);
 
         LocalDateTime created = LocalDateTime.now().minusDays(1L);
-        ItemRequest itemRequest = new ItemRequest(1L, "Это описание запроса",
-                userOwnerOne.getId(), created);
+        List<Item> listItem = List.of(itemOne, itemTwo);
+        ItemRequest itemRequest = new ItemRequest(1L, "Это описание запроса", userOwnerOne, created, listItem);
         itemRequestRepository.save(itemRequest);
-
         itemOne.setRequestId(1L);
         itemRepository.save(itemOne);
         itemTwo.setRequestId(1L);
@@ -100,9 +110,7 @@ public class ItemRepositoryTest {
         itemRepository.save(itemThree);
 
         List<Item> foundItems = itemRepository.getItemsForRequest(1L);
-        List<Item> listToCompare = new ArrayList<>();
-        listToCompare.add(itemOne);
-        listToCompare.add(itemTwo);
+        List<Item> listToCompare = List.of(itemOne, itemTwo);
 
         assertThat(foundItems, is(equalTo(listToCompare)));
     }
