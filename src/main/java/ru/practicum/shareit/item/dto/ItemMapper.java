@@ -26,7 +26,7 @@ public class ItemMapper {
                 itemCreatingDto.getDescription(),
                 itemCreatingDto.getAvailable(),
                 null,
-                null);
+                itemCreatingDto.getRequestId() != null ? itemCreatingDto.getRequestId() : null);
     }
 
     public static ItemWithCommentDto toItemDtoWithComment(Item item, List<CommentForItemDto> comments,

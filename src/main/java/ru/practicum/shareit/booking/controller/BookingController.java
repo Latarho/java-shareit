@@ -6,11 +6,13 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingCreatingDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.helpers.HeaderKey;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 @Validated
@@ -37,21 +39,38 @@ public class BookingController {
         return bookingService.getById(userId, bookingId);
     }
 
-
     @GetMapping()
     public List<BookingDto> getAllBookingsForRequester(@RequestHeader(HeaderKey.USER_KEY) Long userId,
-                                                       @RequestParam(defaultValue = "ALL") String state)
-            throws UserNotFoundException {
-        log.info("Получен запрос - получение информации по всем бронированиям для пользователя id: " + userId);
-        return bookingService.getAllBookingsForRequester(userId, state);
+                                                       @RequestParam(defaultValue = "ALL") String state,
+                                                       @RequestParam(required = false, defaultValue = "0")
+                                                           @Min(0) Integer from,
+                                                       @RequestParam(required = false, defaultValue = "10")
+                                                           @Min(1) Integer size)
+            throws UserNotFoundException, UnsupportedStatusException {
+        try {
+            State stateToConvert = State.valueOf(state);
+            log.info("Получен запрос - получение информации по всем бронированиям для пользователя id: " + userId);
+                return bookingService.getAllBookingsForRequesterWithPagination(userId, stateToConvert, from, size);
+        } catch (IllegalArgumentException e) {
+            throw new UnsupportedStatusException("Unknown state: " + state);
+        }
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getAllBookingsForOwner(@RequestHeader(HeaderKey.USER_KEY) Long userId,
-                                                   @RequestParam(defaultValue = "ALL") String state)
+                                                   @RequestParam(defaultValue = "ALL") String state,
+                                                   @RequestParam(required = false, defaultValue = "0")
+                                                       @Min(0) Integer from,
+                                                   @RequestParam(required = false, defaultValue = "10")
+                                                       @Min(1) Integer size)
             throws UserNotFoundException, UnsupportedStatusException {
-        log.info("Получен запрос - получение информации по всем бронированиям для владельца id: " + userId);
-        return bookingService.getAllBookingsForOwner(userId, state);
+        try {
+            State stateToConvert = State.valueOf(state);
+            log.info("Получен запрос - получение информации по всем бронированиям для владельца id: " + userId);
+                return bookingService.getAllBookingsForOwnerWithPagination(userId, stateToConvert, from, size);
+        } catch (IllegalArgumentException e) {
+            throw new UnsupportedStatusException("Unknown state: " + state);
+        }
     }
 
     @PatchMapping("/{bookingId}")

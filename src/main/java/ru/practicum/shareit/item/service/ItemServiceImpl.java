@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingItemDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
@@ -64,12 +65,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemWithCommentDto> getAll(Long userId) throws UserNotFoundException {
+    public List<ItemWithCommentDto> getAllWithPagination(Long userId, Integer from, Integer size)
+            throws UserNotFoundException {
         if (!userRepository.findById(userId).isPresent()) {
             throw new UserNotFoundException("Отсутствует пользователь id: " + userId);
         } else {
             List<Item> itemToReturn = new ArrayList<>();
-            for (Item item : itemRepository.findAll()) {
+            for (Item item : itemRepository.findAllByOrderByIdAsc(PageRequest.of(from / size, size))) {
                 if (Objects.equals(item.getOwnerId(), userId)) {
                     itemToReturn.add(item);
                 }
@@ -115,12 +117,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchByText(Long userId, String searchText) throws UserNotFoundException {
+    public List<ItemDto> searchByTextWithPagination(Long userId, String searchText, Integer from, Integer size)
+            throws UserNotFoundException {
         if (userRepository.findById(userId).isPresent()) {
             if (searchText.isEmpty()) {
                 return Collections.emptyList();
             } else {
-                List<Item> foundItems = itemRepository.search(searchText);
+                List<Item> foundItems = itemRepository.search(searchText, PageRequest.of(from / size, size));
 
                 List<ItemDto> listItemDto = new ArrayList<>();
                 if (foundItems == null) {
