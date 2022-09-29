@@ -19,9 +19,16 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ItemRequestServiceImpl implements ItemRequestService {
+
     private final ItemRequestRepository itemRequestRepository;
     private final UserRepository userRepository;
 
+    /**
+     * Создание нового запроса на вещь
+     * @param userId идентификатор пользователя
+     * @param itemRequestDto объект класса itemRequest
+     * @return объект класса itemRequest (новый запрос на бронирование)
+     */
     @Override
     public ItemRequestDto create(Long userId, ItemRequestDto itemRequestDto) {
         ItemRequest itemRequest = ItemRequestMapper.toItemRequest(itemRequestDto);
@@ -30,12 +37,24 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return ItemRequestMapper.toItemRequestDto(itemRequestRepository.save(itemRequest));
     }
 
+    /**
+     * Получение информации по всем запросам на вещь для пользователя
+     * @param userId идентификатор пользователя
+     * @return список запросов
+     */
     @Override
     public List<ItemRequestDto> getByRequesterId(Long userId) {
         return ItemRequestMapper.toItemRequestDto(itemRequestRepository.findByRequesterOrderByCreatedDesc(
                 userRepository.checkAndReturnUserIfExist(userId)));
     }
 
+    /**
+     * Получение списка запросов на вещь по идентификатору
+     * @param userId идентификатор пользователя
+     * @param from количество результатов от 0 которые пропускаем
+     * @param size количество результатов в ответе
+     * @return список бронирований
+     */
     @Override
     public List<ItemRequestDto> getById(Long userId, Integer from, Integer size) {
         Pageable pageRequest = PageRequest.of(from, size, Sort.by("created").descending());
@@ -44,6 +63,12 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return ItemRequestMapper.toItemRequestDto(itemRequests);
     }
 
+    /**
+     * Получение информации по всем запросам на вещь для пользователя
+     * @param userId идентификатор пользователя
+     * @param requestId идентификатор бронирования
+     * @return объект класса itemRequest (новый запрос на бронирование)
+     */
     @Override
     public ItemRequestDto getItemRequestById(Long userId, Long requestId) throws ItemRequestNotFoundException {
         userRepository.checkAndReturnUserIfExist(userId);

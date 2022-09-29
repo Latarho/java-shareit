@@ -11,6 +11,7 @@ import ru.practicum.shareit.item.dto.ItemCreatingDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.util.List;
 
 @Slf4j
 @Validated
@@ -26,13 +27,6 @@ public class ItemController {
                                          @Valid @RequestBody ItemCreatingDto itemCreatingDto) {
         log.info("Получен запрос - создание новой вещи: " + itemCreatingDto.toString());
         return itemClient.create(userId, itemCreatingDto);
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<Object> update(@RequestHeader(HeaderKey.USER_KEY) Long userId,
-                                         @PathVariable Long id, @RequestBody ItemCreatingDto itemCreatingDto) {
-        log.info("Получен запрос - обновление существующей вещи: " + itemCreatingDto.toString());
-        return itemClient.update(userId, id, itemCreatingDto);
     }
 
     @GetMapping("/{id}")
@@ -51,6 +45,13 @@ public class ItemController {
         return itemClient.getAll(userId, from, size);
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<Object> update(@RequestHeader(HeaderKey.USER_KEY) Long userId,
+                                         @PathVariable Long id, @RequestBody ItemCreatingDto itemCreatingDto) {
+        log.info("Получен запрос - обновление существующей вещи: " + itemCreatingDto.toString());
+        return itemClient.update(userId, id, itemCreatingDto);
+    }
+
     @GetMapping("/search")
     public ResponseEntity<Object> searchByText(@RequestHeader(HeaderKey.USER_KEY) Long userId,
                                       @RequestParam String text,
@@ -58,8 +59,12 @@ public class ItemController {
                                       @Min(0) Integer from,
                                       @RequestParam(required = false, defaultValue = "10")
                                       @Min(1) Integer size) {
-        log.info("Получен запрос - поиск вещи по тексту: " + text);
-        return itemClient.searchByText(userId, text, from, size);
+        if (text.isEmpty()) {
+            return ResponseEntity.ok().body(List.of());
+        } else {
+            log.info("Получен запрос - поиск вещи по тексту: " + text);
+            return itemClient.searchByText(userId, text, from, size);
+        }
     }
 
     @PostMapping("/{itemId}/comment")

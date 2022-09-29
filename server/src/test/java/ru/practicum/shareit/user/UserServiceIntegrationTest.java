@@ -24,18 +24,6 @@ public class UserServiceIntegrationTest {
     @Autowired
     private UserRepository userRepository;
 
-//    @Test
-//    void checkGetAllUsersIntegrationPositive() {
-//        User userOne = new User(1L, "Serg", "latarho@gmail.com");
-//        userRepository.saveAndFlush(userOne);
-//        List<UserDto> userDtoResult = userService.getAll();
-//
-//        assertThat(1, equalTo(userDtoResult.size()));
-//        assertThat(userOne.getId(), equalTo(userDtoResult.get(0).getId()));
-//        assertThat(userOne.getName(), equalTo(userDtoResult.get(0).getName()));
-//        assertThat(userOne.getEmail(), equalTo(userDtoResult.get(0).getEmail()));
-//    }
-
     @Test
     void checkCreateUserIntegrationPositive() throws ValidationException {
         UserDto userDto = new UserDto(1L, "Serg", "latarho@gmail.com");
