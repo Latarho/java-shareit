@@ -31,6 +31,12 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
     private final BookingRepository bookingRepository;
 
+    /**
+     * Создание новой вещи
+     * @param userId идентификатор пользователя, владельца вещи
+     * @param itemCreatingDto объект класса Item
+     * @return объект класса Item (новая вещь)
+     */
     @Override
     public ItemDto create(Long userId, ItemCreatingDto itemCreatingDto) throws ValidationException, UserNotFoundException {
         Item item = ItemMapper.toItem(itemCreatingDto);
@@ -42,6 +48,12 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
+    /**
+     * Получение вещи по переданному id для пользователя
+     * @param userId идентификатор пользователя, владельца вещи
+     * @param id идентификатор Item
+     * @return объект класса Item соответствующий переданному id
+     */
     @Override
     public ItemWithCommentDto getById(Long userId, Long id) throws ItemNotFoundException, UserNotFoundException {
         if (userRepository.findById(userId).isEmpty()) {
@@ -64,6 +76,13 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
+    /**
+     * Получение списка вещей для пользователя
+     * @param userId идентификатор пользователя, владельца вещи
+     * @param from количество результатов от 0 которые пропускаем
+     * @param size количество результатов в ответе
+     * @return список вещей
+     */
     @Override
     public List<ItemWithCommentDto> getAllWithPagination(Long userId, Integer from, Integer size)
             throws UserNotFoundException {
@@ -92,6 +111,13 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
+    /**
+     * Обновление существующей вещи
+     * @param userId идентификатор пользователя, владельца вещи
+     * @param id идентификатор вещи
+     * @param itemCreatingDto объект класса User
+     * @return объект класса Item с обновленными данными
+     */
     @Override
     public ItemDto update(Long userId, Long id, ItemCreatingDto itemCreatingDto) throws ValidationException,
             AuthFailedException {
@@ -116,13 +142,18 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
+    /**
+     * Поиск вещи по тексту (название и описание)
+     * @param userId идентификатор пользователя, владельца вещи
+     * @param searchText искомый текст
+     * @param from количество результатов от 0 которые пропускаем
+     * @param size количество результатов в ответе
+     * @return список вещей
+     */
     @Override
     public List<ItemDto> searchByTextWithPagination(Long userId, String searchText, Integer from, Integer size)
             throws UserNotFoundException {
         if (userRepository.findById(userId).isPresent()) {
-            if (searchText.isEmpty()) {
-                return Collections.emptyList();
-            } else {
                 List<Item> foundItems = itemRepository.search(searchText, PageRequest.of(from / size, size));
 
                 List<ItemDto> listItemDto = new ArrayList<>();
@@ -134,12 +165,18 @@ public class ItemServiceImpl implements ItemService {
                     }
                     return listItemDto;
                 }
-            }
         } else {
             throw new UserNotFoundException("Отсутствует пользователь id: " + userId);
         }
     }
 
+    /**
+     * Создание нового отзыва к вещи
+     * @param userId идентификатор пользователя, который оставил отзыв
+     * @param itemId идентификатор вещи, к которой оставлен отзыв
+     * @param commentCreatingDto объект класса Comment
+     * @return объект класса Comment (новый отзыв)
+     */
     @Override
     public CommentDto createComment(Long userId, Long itemId, CommentCreatingDto commentCreatingDto)
             throws UserNotFoundException, ValidationException {
@@ -161,6 +198,12 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
+    /**
+     * Получение ближайшего прошлого бронирования
+     * @param itemId идентификатор вещи
+     * @param userId идентификатор пользователя, владельца вещи
+     * @return объект класса Booking
+     */
     private Booking getLastBooking(Long itemId, Long userId) {
         if (bookingRepository.getLastBooking(itemId, userId).size() == 0) {
             return null;
@@ -169,6 +212,12 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 
+    /**
+     * Получение ближайшего будущего бронирования
+     * @param itemId идентификатор вещи
+     * @param userId идентификатор пользователя, владельца вещи
+     * @return объект класса Booking
+     */
     private Booking getNextBooking(Long itemId, Long userId) {
         if (bookingRepository.getNextBooking(itemId, userId).size() == 0) {
             return null;

@@ -21,11 +21,21 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    /**
+     * Создание нового пользователя
+     * @param userDto объект класса User
+     * @return объект класса User (новый пользователь)
+     */
     @Override
     public UserDto create(UserDto userDto) throws ValidationException {
         return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
     }
 
+    /**
+     * Получение пользователя по переданному id
+     * @param id идентификатор пользователя
+     * @return объект класса User соответствующий переданному id
+     */
     @Override
     public UserDto getById(Long id) throws UserNotFoundException {
         if (userRepository.findById(id).isEmpty()) {
@@ -35,6 +45,10 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * Получение списка пользователей
+     * @return список пользователей
+     */
     @Override
     public List<UserDto> getAll() {
         List<UserDto> listUserDto = new ArrayList<>();
@@ -44,6 +58,12 @@ public class UserServiceImpl implements UserService {
         return listUserDto;
     }
 
+    /**
+     * Обновление существующего пользователя
+     * @param id идентификатор пользователя
+     * @param userDto объект класса User
+     * @return объект класса User с обновленными данными
+     */
     @Override
     public UserDto update(Long id, UserDto userDto) throws EmailAlreadyExistsException {
         Optional<User> userFromList = userRepository.findById(id);
@@ -63,6 +83,10 @@ public class UserServiceImpl implements UserService {
         return UserMapper.toUserDto(userRepository.save(UserMapper.toUser(userDto)));
     }
 
+    /**
+     * Удаление существующего пользователя
+     * @param id идентификатор пользователя
+     */
     @Override
     public void delete(Long id) throws UserNotFoundException {
         if (userRepository.findById(id).isEmpty()) {

@@ -30,15 +30,6 @@ public class BookingController {
         return bookingService.create(userId, bookingCreatingDto);
     }
 
-    @PatchMapping("/{bookingId}")
-    public BookingDto update(@RequestHeader(HeaderKey.USER_KEY) Long userId, @PathVariable Long bookingId,
-                             @RequestParam Boolean approved)
-            throws UserNotFoundException, BookingNotFoundException, ItemNotBelongsToUserException,
-            ValidationException {
-        log.info("Получен запрос - обновление информации о бронировании (статус) id: " + bookingId.toString());
-        return bookingService.update(userId, bookingId, approved);
-    }
-
     @GetMapping("/{bookingId}")
     public BookingDto getById(@RequestHeader(HeaderKey.USER_KEY) Long userId, @PathVariable Long bookingId)
             throws UserNotFoundException, BookingNotFoundException, ItemNotBelongsToUserException {
@@ -72,5 +63,14 @@ public class BookingController {
         } catch (IllegalArgumentException e) {
             throw new UnsupportedStatusException("Unknown state: " + state);
         }
+    }
+
+    @PatchMapping("/{bookingId}")
+    public BookingDto update(@RequestHeader(HeaderKey.USER_KEY) Long userId, @PathVariable Long bookingId,
+                             @RequestParam Boolean approved)
+            throws UserNotFoundException, BookingNotFoundException, ItemNotBelongsToUserException,
+            ValidationException {
+        log.info("Получен запрос - обновление информации о бронировании (статус) id: " + bookingId.toString());
+        return bookingService.update(userId, bookingId, approved);
     }
 }

@@ -28,6 +28,12 @@ public class BookingServiceImpl implements BookingService {
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
 
+    /**
+     * Создание нового бронирования
+     * @param userId идентификатор пользователя, который бронирует вещь
+     * @param bookingCreatingDto объект класса Booking
+     * @return объект класса Booking (новое бронирование)
+     */
     @Override
     public BookingDto create(Long userId, BookingCreatingDto bookingCreatingDto) throws ItemNotFoundException,
             UserNotFoundException, ValidationException {
@@ -63,6 +69,12 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+    /**
+     * Получение брониирования по переданному id для пользователя
+     * @param userId идентификатор пользователя
+     * @param bookingId идентификатор бронирования
+     * @return объект класса Booking соответствующий переданному id
+     */
     @Override
     public BookingDto getById(Long userId, Long bookingId) throws ItemNotBelongsToUserException, UserNotFoundException,
             BookingNotFoundException {
@@ -87,6 +99,14 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+    /**
+     * Получение информации по всем бронированиям для пользователя
+     * @param userId идентификатор пользователя
+     * @param state статус бронирования
+     * @param from количество результатов от 0 которые пропускаем
+     * @param size количество результатов в ответе
+     * @return список бронирований с определенным статусом для пользователя
+     */
     @Override
     public List<BookingDto> getAllBookingsForRequesterWithPagination(Long userId, State state, Integer from,
                                                                      Integer size)
@@ -129,6 +149,14 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+    /**
+     * Получение информации по всем бронированиям для владельца
+     * @param userId идентификатор пользователя
+     * @param state статус бронирования
+     * @param from количество результатов от 0 которые пропускаем
+     * @param size количество результатов в ответе
+     * @return список бронирований с определенным статусом для владельца
+     */
     @Override
     public List<BookingDto> getAllBookingsForOwnerWithPagination(Long userId, State state, Integer from, Integer size)
             throws UserNotFoundException {
@@ -170,6 +198,13 @@ public class BookingServiceImpl implements BookingService {
        }
     }
 
+    /**
+     * Обновление существующего бронирования
+     * @param userId идентификатор пользователя
+     * @param bookingId идентификатор бронирования
+     * @param approved Подтверждено true/false
+     * @return объект класса Booking с обновленными данными
+     */
     @Override
     public BookingDto update(Long userId, Long bookingId, Boolean approved) throws UserNotFoundException,
             BookingNotFoundException, ItemNotBelongsToUserException, ValidationException {

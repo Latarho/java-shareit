@@ -30,14 +30,6 @@ public class BookingController {
 		return bookingClient.create(userId, bookingCreatingDto);
 	}
 
-	@PatchMapping("/{bookingId}")
-	public ResponseEntity<Object> update(@RequestHeader(HeaderKey.USER_KEY) Long userId,
-										 @PathVariable Long bookingId,
-										 @RequestParam Boolean approved) {
-		log.info("Получен запрос - обновление информации о бронировании (статус) id: " + bookingId.toString());
-		return bookingClient.update(userId, bookingId, approved);
-	}
-
 	@GetMapping("/{bookingId}")
 	public ResponseEntity<Object> getById(@RequestHeader(HeaderKey.USER_KEY) Long userId,
 										  @PathVariable Long bookingId) {
@@ -75,5 +67,13 @@ public class BookingController {
 		} catch (IllegalArgumentException e) {
 			throw new UnsupportedStatusException("Unknown state: " + state);
 		}
+	}
+
+	@PatchMapping("/{bookingId}")
+	public ResponseEntity<Object> update(@RequestHeader(HeaderKey.USER_KEY) Long userId,
+										 @PathVariable Long bookingId,
+										 @RequestParam Boolean approved) {
+		log.info("Получен запрос - обновление информации о бронировании (статус) id: " + bookingId.toString());
+		return bookingClient.update(userId, bookingId, approved);
 	}
 }
